@@ -1,6 +1,6 @@
 # F1 Race Analyzer
 
-Stage 1: a runnable Next.js/TypeScript foundation. No race data, database, ingestion or AI is implemented.
+A runnable Next.js/TypeScript foundation plus a Stage 2 local OpenF1 investigation CLI. The app does not display race data yet; no database, production ingestion or AI is implemented.
 
 ## Run locally (PowerShell)
 

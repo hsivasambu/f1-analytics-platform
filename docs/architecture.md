@@ -2,7 +2,7 @@
 
 ## Implemented
 
-Next.js App Router and TypeScript render `/` and `/methodology` using local content and CSS. There are no app API routes, external requests, secrets, data stores, metrics or AI calls. Both pages can be built statically. ESLint, TypeScript, Node test runner through tsx, and Next production build form the verification workflow. GitHub Actions is configured but has not run remotely.
+Next.js App Router and TypeScript render `/` and `/methodology` using local content and CSS. There are no app API routes, external requests, secrets, data stores, metrics or AI calls. Both pages can be built statically. ESLint, TypeScript, Node test runner through tsx, and Next production build form the verification workflow. GitHub Actions runs the same checks; verified remote outcomes are recorded in progress.
 
 ## Proposed later data flow (not implemented)
 

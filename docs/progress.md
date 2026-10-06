@@ -37,7 +37,7 @@ Implemented:
 - Sequential rate spacing, bounded transient retries, Retry-After handling, request/body timeouts and response byte/row limits; clear nonzero failure output.
 - Unchanged raw JSON archived in gitignored per-run directories with URL, filters, UTC retrieval time and SHA-256 provenance. Generated JSON/Markdown field profile, candidate keys, join checks and candidate access report.
 - Reviewed derived profile and Stage 2 guide with exact commands, walkthrough, source semantics, candidate proposals and two exercises (one SQL) with separate answers.
-- GitHub repository created and foundation pushed. Foundation GitHub Actions completed successfully: https://github.com/hsivasambu/f1-analytics-platform/actions/runs/37405732906. Stage 2 changes are prepared for the same repository.
+- GitHub repository created and foundation pushed. Foundation GitHub Actions completed successfully: https://github.com/hsivasambu/f1-analytics-platform/actions/runs/37405732906. Stage 2 implementation committed as 1618833 and pushed to the same repository. Its GitHub Actions run completed successfully: https://github.com/hsivasambu/f1-analytics-platform/actions/runs/37406345698.
 
 Actual source investigation (October 5, 2026 Toronto / October 6 UTC):
 - OpenF1 official documentation reviewed. No login/token required for these historical endpoints.
