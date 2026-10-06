@@ -18,7 +18,8 @@
     "db:migrate": "tsx scripts/db/migrate.ts",
     "db:roles": "tsx scripts/db/roles.ts",
     "db:fixture": "tsx scripts/db/fixture.ts",
-    "db:verify": "tsx scripts/db/verify.ts"
+    "db:verify": "tsx scripts/db/verify.ts",
+    "db:audit": "tsx scripts/db/audit.ts"
   },
   "dependencies": {
     "next": "16.3.8",

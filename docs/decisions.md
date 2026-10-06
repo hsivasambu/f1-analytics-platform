@@ -52,8 +52,12 @@ Use unconstrained-scale numeric seconds and timestamptz for source instants, ret
 
 ## D012 — Three credential purposes and separate environments
 
-Migration credentials perform explicit DDL/provisioning. SQL-created ingestion/app logins inherit NOLOGIN privilege groups: ingestion can write typed projections and append source observations, while the app can only SELECT typed tables. Both lack admin/DDL/temp privileges; the app cannot read raw/migration tables. No credentials reach browser variables, Git, CI or chat. Separate development/production Neon projects are proposed within the officially verified Free limits, but account sign-in is still required. Only local development is actually provisioned and verified so far.
+Migration credentials perform explicit DDL/provisioning. SQL-created ingestion/app logins inherit NOLOGIN privilege groups: ingestion can write typed projections and append source observations, while the app can only SELECT typed tables. Both lack admin/DDL/temp privileges; the app cannot read raw/migration tables. No credentials reach browser variables, Git, CI or chat. User-created development/production targets now have distinct Neon endpoints, applied migrations and verified restricted connections. Separate project names/membership and account Free status still require Console confirmation because the agent browser is signed out. Published Free limits were checked; no upgrade was selected.
 
 ## D013 — Explicit, checksum-tracked SQL migrations and disposable verification
 
 Keep versioned SQL files and LF line endings. A direct Postgres client takes an advisory lock, runs each unapplied file and ledger entry in one transaction, and refuses missing/changed migration history. New versions modify earlier behavior instead of silently editing applied SQL. Fixture/verification commands are development-only and roll back synthetic rows; identity sequence counters can still advance. CI has a disposable Postgres service and test-only credentials. Tradeoff: these scripts require a schema-owning migration account; pooled/HTTP endpoints and automatic app-start migration are not used.
+
+## D014 — Read-only production audit
+
+Use `db:audit -- --env production` to check live credential identity, endpoint/database consistency, TLS certificate authorization, ledger and restricted ACLs in read-only transactions. Exercise failing writes and synthetic rows only through development verification. Tradeoff: production ACL inspection does not execute denied writes, while development supplies the behavioral permission tests. Inspect the client's TLS socket rather than the backend SSL statistics behind Neon's proxy.

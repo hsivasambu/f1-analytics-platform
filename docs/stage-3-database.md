@@ -23,7 +23,11 @@ Every typed table has a source-record FK; the diagram shows one representative l
 
 ## Current verified setup
 
-An isolated **local development Postgres 18** container, `f1-analytics-stage3-dev`, is running on **127.0.0.1:15432** with named volume `f1-analytics-stage3-dev-data`. Other existing Docker containers were left alone. Generated local migration/ingestion/application credentials are only in gitignored environment files. Production currently has a blank environment template. **Neon projects and Neon execution are pending your account sign-in; neither is claimed as created or verified.**
+Development and production now use distinct Neon direct endpoints from the user-created projects. All three migrations applied to both; restricted SQL-created app/ingestion logins connect successfully, with credentials saved only in their respective gitignored env files. Development fixture and permission checks passed and rolled back. Production was audited read-only; no fixture was inserted. Both have zero session rows. Repeated migration/provisioning runs retain the schema and credentials.
+
+The account Console available to this agent is signed out. Database access, distinct endpoints and certificate validation are verified; project names, independent project membership, account **Free** status and compute settings cannot be established from PostgreSQL URLs. Confirm those four items in your Console using the checklist below. No paid option was selected by this work.
+
+The previous isolated local Postgres 18 container `f1-analytics-stage3-dev` on `127.0.0.1:15432` and its named volume remain available; the env files now target Neon. No Docker container or volume was removed.
 
 Start/stop the existing local container:
 
@@ -126,3 +130,18 @@ The fixture has three rows and two known durations. AVG ignores NULL and returns
 ## Design tradeoff
 
 Full-record hashes plus occurrence ranks conservatively distinguish event content and preserve duplicate occurrences. This avoids assuming that same-time messages are one event, but corrected records remain separate and need later reconciliation. The raw archive plus source key guards preserves an audit trail without prematurely implementing ingestion or analytics. See the dictionary's deduplication section for incomplete-response and collision limitations.
+
+## Recheck the completed Neon setup
+
+Run from the repository root:
+
+```powershell
+npm run db:audit
+npm run db:audit -- --env production
+npm run db:verify
+npm run dev
+```
+
+Expected: both audits print three ledger versions, `sessions=0` before any later ingestion, and PASS lines for the three credential purposes. Development verification prints PASS lines and rolls fixtures back. Next serves the home page at http://localhost:3000; open `/methodology` next. The app still needs no database connection.
+
+The audit opens read-only transactions in either environment, checks matching endpoint/database/role, actual TLS socket certificate authorization, migration ledger and restricted privileges. `pg_stat_ssl` on the Neon backend reported false during investigation, so it is not used to claim public-connection encryption. Production verification deliberately uses this read-only audit; destructive permission-denial checks and synthetic calculations ran only in development. The two learning exercises and separate answers above remain applicable to the rollback fixture.
