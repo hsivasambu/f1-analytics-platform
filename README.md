@@ -1,6 +1,6 @@
 # F1 Race Analyzer
 
-A runnable Next.js/TypeScript foundation plus a Stage 2 local OpenF1 investigation CLI. The app does not display race data yet; no database, production ingestion or AI is implemented.
+A runnable Next.js/TypeScript foundation, bounded OpenF1 investigation CLI, and Stage 3 Postgres schema/migration tooling. The app does not display race data or connect to Postgres yet; production ingestion and AI are not implemented.
 
 ## Run locally (PowerShell)
 
@@ -21,11 +21,11 @@ npm run build
 npm start
 ```
 
-Expected: lint and typecheck exit 0; tests report 2 passed; build lists `/` and `/methodology` as static routes. `npm start` serves the production build. Stop either server with Ctrl+C. `npm run check` runs all four checks in order. No `.env` file or account is needed.
+Expected: lint and typecheck exit 0; tests report 14 passed; build lists `/` and `/methodology` as static routes. `npm start` serves the production build. Stop either server with Ctrl+C. `npm run check` runs all four checks in order. No `.env` file or account is needed.
 
 ## Where things belong
 
-Read [architecture](docs/architecture.md), [product questions](docs/product-questions.md), [decisions](docs/decisions.md) and [progress](docs/progress.md). Only `src/app` and the foundation tests exist today; the architecture names future locations without implementing them.
+Read [architecture](docs/architecture.md), [product questions](docs/product-questions.md), [decisions](docs/decisions.md) and [progress](docs/progress.md). The app, source investigation, SQL migrations and database setup scripts now exist. The architecture distinguishes those from future analytics, snapshots and AI.
 
 ## Learning exercises
 
@@ -47,3 +47,7 @@ FROM a JOIN b ON a.lap_number = b.lap_number;
 ## Stage 2 investigation
 
 The [Stage 2 guide](docs/stage-2-investigation.md) contains exact CLI commands, actual coverage findings, a record walkthrough and two exercises with separate answers. Run `npm run data:discover -- 2024` for session metadata or `npm run data:investigate -- 2024` for the bounded investigation. Raw JSON is retained under gitignored `data/raw/openf1/`; the derived [profile](docs/openf1-profile.md) documents the observed sample. The app remains the Stage 1 shell.
+
+## Stage 3 database checkpoint
+
+Read the [Stage 3 guide](docs/stage-3-database.md) for Neon Free setup, secret-file handling, exact migration/fixture commands, relationships, indexes and two learning exercises with separate answers. See the [implemented data dictionary](docs/data-dictionary.md). Local development Postgres is verified; Neon account sign-in and remote project creation are pending. `npm run db:migrate`, `npm run db:roles`, `npm run db:fixture` and `npm run db:verify` are explicit development commands. The normal app/check workflow requires no live database.

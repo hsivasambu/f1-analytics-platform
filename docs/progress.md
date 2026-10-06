@@ -61,3 +61,33 @@ Limitations:
 Checkpoint: run `npm run data:investigate -- 2024`, inspect local raw records and profile, explain lap grain and why lane duration differs from stationary time. The app still runs with `npm run dev` independently of OpenF1.
 
 Next stage: await the user's numbered Stage 3 request. No schema or later features have been implemented.
+
+## Stage 3 — schema and database setup
+
+Purpose: give source observations explicit grains, keys, relationships and provenance before production ingestion or race calculations.
+
+Implemented:
+- Three versioned SQL migrations for sessions, internal provisional driver identities, session entries, laps, stints, pit/control event content occurrences, ingestion runs, original response payloads and array-element records. Composite keys and foreign keys reflect source scope.
+- Exact-decimal seconds, timezone-aware instants, raw response text/JSON preservation, nullable unknowns, source endpoint/key guards, immutable raw archive, event deduplication keys and targeted indexes.
+- Explicit migration runner with advisory lock, transactions and SHA-256 ledger; restricted SQL-created ingestion/application logins with locally generated credentials; transactional synthetic fixture and database verification.
+- Separate gitignored development/production environment files plus tracked empty .env.example. Production URL is blank; no secrets were printed or committed. No NEXT_PUBLIC_ credential variables.
+- Isolated local development Postgres 18 container f1-analytics-stage3-dev on 127.0.0.1:15432 with a named volume; other containers untouched.
+- Updated implemented data dictionary, architecture/decisions, Stage 3 walkthrough and two exercises with separate answers (SQL AVG answer computed on the fixture). CI adds disposable Postgres checks without any local/Neon secrets.
+
+Verification actually performed:
+- Three migrations applied to local development Postgres; repeated runs apply zero versions. Restricted role provisioning rerun retains logins/passwords.
+- Tiny synthetic fixture inserted and queried, then rolled back. Three rows retain decimal/NULL values and session-specific driver names; joining only on driver number incorrectly makes six rows.
+- Real database checks pass for UUID/composite FKs, duplicate lap rejection, negative/NaN durations, UTC equivalence with original offset string preserved, wrong provenance endpoint/source keys, immutable archive and invalid source ordinal rejection.
+- Event checks retain three pit occurrences with two distinct content hashes and two same-time control records with different scopes. Replayed event content/occurrence keys are rejected while source response/row observations are retained in the transactional check.
+- Real application and ingestion logins have no admin flags/neon_superuser membership, no DDL/public-schema/temp access; app reads typed tables but insert/update/delete/truncate/raw/meta access fails with SQLSTATE 42501. Ingestion can write a run but cannot delete typed rows or mutate raw payloads.
+- Database fixture/verification rolls back all inserted rows; local migrations and roles remain. LF normalization reconciled only matching initial local ledger hashes without changing SQL statements; .gitattributes preserves LF for subsequent checkouts.
+- Final `npm run check` passed: lint, types, 14/14 unit/smoke tests and the static production build. `db:verify` passed after final script changes. Production fixture invocation was actually rejected before connecting. Git ignore checks cover all three local credential files. Remote Stage 3 CI has not run yet.
+
+Neon status and limitation:
+- Official Free quota document checked October 5, 2026: 100 projects, 10 branches/project, 100 CU-hours/project/month, 1 GB Postgres/project (20 GB account cap), 5 GB public transfer/project/month, 5-minute scale-to-zero. Older indexed sources differ; the guide tells the user to honor the lower console allowance if needed. No paid option/upgrade chosen.
+- Neon Console is open at login. User account access is pending; neither remote project nor a Neon connection/migration is claimed as completed. The guide gives exact project/credential steps. Local development checkpoint is working; the Neon portion requires the user to sign in and place direct owner URLs locally, never in chat.
+- No historical records imported into Postgres, production ingestion/upserts, analytics, DB-backed app APIs, snapshots or AI added. Those remain outside Stage 3. Event corrections/identity reconciliation need later reviewed policies; non-key typed mapping is a later ingestion responsibility.
+
+Checkpoint: run db:migrate → db:roles → db:fixture → db:verify against development; explain each table's grain, the session-entry/lap join, event-content keys and index tradeoffs. App still runs without a database. To complete the remote portion of this stage, sign in to Neon Free and configure the separate local environment files as described in stage-3-database.md.
+
+Next stage: await the user's numbered Stage 4 request after the Stage 3 Neon/account step is resolved. No later-stage features implemented.

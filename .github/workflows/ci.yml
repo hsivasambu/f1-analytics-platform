@@ -5,6 +5,18 @@ permissions:
 jobs:
   check:
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:18
+        env:
+          POSTGRES_USER: f1_migrator
+          POSTGRES_PASSWORD: ci-fixture-only
+          POSTGRES_DB: f1_development
+        ports:
+          - 15432:5432
+        options: >-
+          --health-cmd "pg_isready -U f1_migrator -d f1_development"
+          --health-interval 5s --health-timeout 5s --health-retries 10
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -13,3 +25,10 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run check
+      - name: Configure disposable CI database
+        run: |
+          printf '%s\n' 'DATABASE_ENV=development' 'MIGRATION_DATABASE_URL=postgresql://f1_migrator:ci-fixture-only@127.0.0.1:15432/f1_development?sslmode=disable' 'INGESTION_DATABASE_URL=' 'APP_DATABASE_URL=' > .env.development.local
+      - run: npm run db:migrate
+      - run: npm run db:roles
+      - run: npm run db:fixture
+      - run: npm run db:verify

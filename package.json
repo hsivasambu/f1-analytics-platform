@@ -14,7 +14,11 @@
     "test": "tsx --test tests/*.test.tsx",
     "check": "npm run lint && npm run typecheck && npm test && npm run build",
     "data:discover": "tsx scripts/openf1/cli.ts discover",
-    "data:investigate": "tsx scripts/openf1/cli.ts investigate"
+    "data:investigate": "tsx scripts/openf1/cli.ts investigate",
+    "db:migrate": "tsx scripts/db/migrate.ts",
+    "db:roles": "tsx scripts/db/roles.ts",
+    "db:fixture": "tsx scripts/db/fixture.ts",
+    "db:verify": "tsx scripts/db/verify.ts"
   },
   "dependencies": {
     "next": "16.3.8",
@@ -23,10 +27,12 @@
   },
   "devDependencies": {
     "@types/node": "22.20.5",
+    "@types/pg": "8.23.1",
     "@types/react": "19.3.0",
     "@types/react-dom": "19.3.0",
     "eslint": "9.39.5",
     "eslint-config-next": "16.3.8",
+    "pg": "8.23.1",
     "tsx": "4.23.15",
     "typescript": "6.0.3"
   }

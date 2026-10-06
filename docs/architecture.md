@@ -1,6 +1,6 @@
-# Architecture — Stage 1
+# Architecture — implemented through Stage 3
 
-## Implemented
+## Stage 1 foundation
 
 Next.js App Router and TypeScript render `/` and `/methodology` using local content and CSS. There are no app API routes, external requests, secrets, data stores, metrics or AI calls. Both pages can be built statically. ESLint, TypeScript, Node test runner through tsx, and Next production build form the verification workflow. GitHub Actions runs the same checks; verified remote outcomes are recorded in progress.
 
@@ -47,3 +47,11 @@ docs/                   existing: implementation and learning records
 `scripts/openf1/core.ts` implements bounded historical HTTP access and field/key profiling; `scripts/openf1/cli.ts` discovers race sessions, probes three candidates and samples two drivers from the first candidate passing endpoint checks. These scripts run locally, outside the app. No database schema, SQL analytics, application API or AI is implemented.
 
 Raw JSON text and a URL/retrieval-time/hash manifest are archived per run in gitignored `data/raw/openf1`. Low-volume driver/stint/pit/control responses cover three candidates; extended lap sampling covers only one race. Derived field profiles and join checks are generated locally, with a reviewed result in `docs/openf1-profile.md`. See `docs/stage-2-investigation.md` for exact bounds and actual findings. The original proposed ingestion and snapshot locations remain future designs; this is investigation, not production ETL.
+
+## Stage 3 — schema and database tooling
+
+Implemented schemas: `f1` (typed sessions, provisional drivers, session entries, laps, stints, pit/control events); `f1_ingest` (runs, immutable raw responses and source-array records); `f1_meta` (migration version/checksum ledger). Three versioned SQL migrations create tables, indexes, restricted role groups and source-key guards. The data dictionary describes actual columns and relationships.
+
+`scripts/db` provides explicit migration, restricted-login provisioning, rollback-only synthetic fixture and database-verification commands. No schema/role action happens at application startup. Local development Postgres 18 is isolated on localhost:15432; Neon Console sign-in and remote development/production projects remain pending. Separate gitignored development/production environment files select targets. Migration credentials own schema changes; the ingestion login has scoped DML without archive mutation; the application login can only SELECT typed tables and cannot access raw or migration schemas.
+
+The app remains independent of Postgres. No production ingestion mapper, historical race loading, SQL race metrics, DB-backed routes, snapshots or AI tools are implemented. CI uses disposable Postgres to check migrations and real login permissions; it never receives local or Neon credentials. SQL teaching examples apply to synthetic fixtures only. See `stage-3-database.md` for exact commands, current setup and remaining account step.

@@ -37,3 +37,23 @@ Store unchanged JSON text with URL, filter, UTC retrieval time and SHA-256 prove
 Sequential requests are spaced 1.1s apart; each logical query allows three attempts and a 20s timeout including body reads. Respect Retry-After up to 30s and retry only 429, selected transient server errors, network errors and timeouts. Stop on permanent access errors, malformed data or payload bounds. Tradeoff: a sustained outage requires a later manual rerun, and the CLI will not retry indefinitely. A 24-query logical budget caps the investigation (normally 19; at most 72 attempted requests).
 
 GitHub repository created and initial foundation pushed to `https://github.com/hsivasambu/f1-analytics-platform` at the user's request. Raw records remain excluded from commits. No website deployment or paid service was enabled.
+
+## D009 — Source-scoped entries and provisional UUID identities
+
+Sessions use OpenF1 session keys; entries use (session_key, driver_number); laps/stints extend that pair with their source sequence number. Driver identities use internal UUIDs with unresolved status by default. An entry may have no resolved UUID. Names/acronyms/numbers are never unique person keys. Tradeoff: later cross-session person comparisons need reviewed identity linkage rather than an automatic number match.
+
+## D010 — Conservative event content/occurrence keys
+
+No stable pit/control event ID was observed. Use a database identity PK plus UNIQUE(session_key, SHA-256 of complete JSONB-text source object, duplicate occurrence rank within that response). Ordinal and rank come from the archived array, not caller assertions. All fields participate; same-time distinct content stays distinct, identical repeated objects remain separate occurrences, and exact replay keys fail. Tradeoff: source corrections/incomplete-response ambiguities need explicit future reconciliation; this is not real-world incident identity. Raw observations remain available. No production ON CONFLICT loader exists yet.
+
+## D011 — Exact source projections with modest constraints
+
+Use unconstrained-scale numeric seconds and timestamptz for source instants, retaining the original JSON response text and object. Keep unknown fields NULL; source arrays and unrecognized category/compound text survive. Reject negative/nonfinite durations, enforce source key/provenance relationships, but do not assert exact sector sums, alias equality, stint range ordering or race-control session bounds. Tradeoff: quality anomalies need profiling instead of being universally rejected; extra raw storage consumes the Free storage allowance.
+
+## D012 — Three credential purposes and separate environments
+
+Migration credentials perform explicit DDL/provisioning. SQL-created ingestion/app logins inherit NOLOGIN privilege groups: ingestion can write typed projections and append source observations, while the app can only SELECT typed tables. Both lack admin/DDL/temp privileges; the app cannot read raw/migration tables. No credentials reach browser variables, Git, CI or chat. Separate development/production Neon projects are proposed within the officially verified Free limits, but account sign-in is still required. Only local development is actually provisioned and verified so far.
+
+## D013 — Explicit, checksum-tracked SQL migrations and disposable verification
+
+Keep versioned SQL files and LF line endings. A direct Postgres client takes an advisory lock, runs each unapplied file and ledger entry in one transaction, and refuses missing/changed migration history. New versions modify earlier behavior instead of silently editing applied SQL. Fixture/verification commands are development-only and roll back synthetic rows; identity sequence counters can still advance. CI has a disposable Postgres service and test-only credentials. Tradeoff: these scripts require a schema-owning migration account; pooled/HTTP endpoints and automatic app-start migration are not used.
