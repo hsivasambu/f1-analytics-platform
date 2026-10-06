@@ -145,3 +145,7 @@ npm run dev
 Expected: both audits print three ledger versions, `sessions=0` before any later ingestion, and PASS lines for the three credential purposes. Development verification prints PASS lines and rolls fixtures back. Next serves the home page at http://localhost:3000; open `/methodology` next. The app still needs no database connection.
 
 The audit opens read-only transactions in either environment, checks matching endpoint/database/role, actual TLS socket certificate authorization, migration ledger and restricted privileges. `pg_stat_ssl` on the Neon backend reported false during investigation, so it is not used to claim public-connection encryption. Production verification deliberately uses this read-only audit; destructive permission-denial checks and synthetic calculations ran only in development. The two learning exercises and separate answers above remain applicable to the rollback fixture.
+
+### Subsequent Stage 4 checkpoint
+
+The zero-session/three-version expectations above describe Stage 3's checkpoint (three migrations then). Stage 4 now adds migration 004 to both Neon targets; development contains one race while production remains empty. `db:audit` now expects four migrations and reports actual session counts. See `stage-4-ingestion.md` for the current dataset and retention lifecycle.

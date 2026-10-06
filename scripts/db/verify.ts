@@ -39,7 +39,7 @@ async function main() {
     assert.equal(joined.rows[1].lap_duration, null);
     assert.equal(joined.rows[2].full_name, 'Different Fixture Driver');
     const wrong = await owner.query(`SELECT count(*)::int AS n FROM f1.laps l JOIN f1.session_entries e USING(driver_number)
-      WHERE l.session_key IN (900000001, 900000002)`);
+      WHERE l.session_key IN (900000001, 900000002) AND e.session_key IN (900000001, 900000002)`);
     assert.equal(wrong.rows[0].n, 6, 'Driver number alone multiplies unrelated session rows');
     const stamp = await owner.query(`SELECT l.date_start = timestamptz '2024-01-01T12:00:00Z' AS same_instant,
       r.raw_record->>'date_start' AS original FROM f1.laps l JOIN f1_ingest.source_records r ON r.record_id=l.source_record_id

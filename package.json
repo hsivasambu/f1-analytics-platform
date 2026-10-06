@@ -19,7 +19,11 @@
     "db:roles": "tsx scripts/db/roles.ts",
     "db:fixture": "tsx scripts/db/fixture.ts",
     "db:verify": "tsx scripts/db/verify.ts",
-    "db:audit": "tsx scripts/db/audit.ts"
+    "db:audit": "tsx scripts/db/audit.ts",
+    "data:ingest": "tsx scripts/ingest/cli.ts",
+    "db:verify-ingestion": "tsx scripts/ingest/verify.ts",
+    "data:inspect": "tsx scripts/ingest/inspect.ts",
+    "db:setup-ingestion-test": "tsx scripts/db/setup-ingestion-test.ts"
   },
   "dependencies": {
     "next": "16.3.8",

@@ -11,11 +11,11 @@ jobs:
         env:
           POSTGRES_USER: f1_migrator
           POSTGRES_PASSWORD: ci-fixture-only
-          POSTGRES_DB: f1_development
+          POSTGRES_DB: f1_test
         ports:
           - 15432:5432
         options: >-
-          --health-cmd "pg_isready -U f1_migrator -d f1_development"
+          --health-cmd "pg_isready -U f1_migrator -d f1_test"
           --health-interval 5s --health-timeout 5s --health-retries 10
     steps:
       - uses: actions/checkout@v4
@@ -27,9 +27,12 @@ jobs:
       - run: npm run check
       - name: Configure disposable CI database
         run: |
-          printf '%s\n' 'DATABASE_ENV=development' 'MIGRATION_DATABASE_URL=postgresql://f1_migrator:ci-fixture-only@127.0.0.1:15432/f1_development?sslmode=disable' 'INGESTION_DATABASE_URL=' 'APP_DATABASE_URL=' > .env.development.local
+          printf '%s\n' 'DATABASE_ENV=development' 'MIGRATION_DATABASE_URL=postgresql://f1_migrator:ci-fixture-only@127.0.0.1:15432/f1_test?sslmode=disable' 'INGESTION_DATABASE_URL=' 'APP_DATABASE_URL=' > .env.development.local
       - run: npm run db:migrate
       - run: npm run db:roles
       - run: npm run db:fixture
       - run: npm run db:verify
       - run: npm run db:audit
+      - name: Configure isolated ingestion test fixture target
+        run: cp .env.development.local .env.ingestion-test.local
+      - run: npm run db:verify-ingestion

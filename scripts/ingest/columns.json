@@ -1,0 +1,79 @@
+{
+  "sessions": [
+    "session_key",
+    "meeting_key",
+    "year",
+    "session_name",
+    "session_type",
+    "circuit_key",
+    "circuit_short_name",
+    "country_code",
+    "country_key",
+    "country_name",
+    "location",
+    "date_start",
+    "date_end",
+    "gmt_offset",
+    "is_cancelled"
+  ],
+  "drivers": [
+    "session_key",
+    "driver_number",
+    "broadcast_name",
+    "first_name",
+    "last_name",
+    "full_name",
+    "name_acronym",
+    "team_name",
+    "team_colour",
+    "country_code",
+    "headshot_url"
+  ],
+  "laps": [
+    "session_key",
+    "driver_number",
+    "lap_number",
+    "date_start",
+    "lap_duration",
+    "duration_sector_1",
+    "duration_sector_2",
+    "duration_sector_3",
+    "is_pit_out_lap",
+    "i1_speed",
+    "i2_speed",
+    "st_speed",
+    "segments_sector_1",
+    "segments_sector_2",
+    "segments_sector_3"
+  ],
+  "stints": [
+    "session_key",
+    "driver_number",
+    "stint_number",
+    "compound",
+    "lap_start",
+    "lap_end",
+    "tyre_age_at_start"
+  ],
+  "pit": [
+    "session_key",
+    "driver_number",
+    "date",
+    "lap_number",
+    "lane_duration",
+    "pit_duration",
+    "stop_duration"
+  ],
+  "race_control": [
+    "session_key",
+    "driver_number",
+    "date",
+    "lap_number",
+    "category",
+    "flag",
+    "message",
+    "scope",
+    "sector",
+    "qualifying_phase"
+  ]
+}

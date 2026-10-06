@@ -61,3 +61,11 @@ Keep versioned SQL files and LF line endings. A direct Postgres client takes an 
 ## D014 â€” Read-only production audit
 
 Use `db:audit -- --env production` to check live credential identity, endpoint/database consistency, TLS certificate authorization, ledger and restricted ACLs in read-only transactions. Exercise failing writes and synthetic rows only through development verification. Tradeoff: production ACL inspection does not execute denied writes, while development supplies the behavioral permission tests. Inspect the client's TLS socket rather than the backend SSL statistics behind Neon's proxy.
+
+## D015 — Validated ELT and atomic whole-session refresh
+
+Use the six investigated endpoints for session 9644 only. Validate full response shapes/types/keys/joins in TypeScript, load original raw text to private staging, then project relational values in explicit SQL. One lock serializes fetch/publication, and one transaction publishes provenance/typed rows/version or rolls back. Restricted owner-defined functions allow session replacement/retention without granting general DELETE. Tradeoff: the migration owner remains powerful; SQL functions are reviewed as part of versioned migrations, not public APIs.
+
+## D016 — Latest-source retention and explicit replacement changes
+
+Keep six latest successful payloads and their observations, plus 20 compact run summaries and the protected origin if older. Identical bytes retain rows/version; changed responses replace session rows, treating source-object corrections as removals/additions and removing absent rows. Event IDs may change. Tradeoff: older raw versions are unavailable for full replay, and valid upstream omissions cannot be established from endpoint responses alone. Refuse existing linked identities instead of silently discarding identity work. Stage 2 investigation files are preserved separately.

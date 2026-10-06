@@ -51,3 +51,7 @@ The [Stage 2 guide](docs/stage-2-investigation.md) contains exact CLI commands, 
 ## Stage 3 database checkpoint
 
 Read the [Stage 3 guide](docs/stage-3-database.md) for Neon Free setup, secret-file handling, exact migration/fixture commands, relationships, indexes and two learning exercises with separate answers. See the [implemented data dictionary](docs/data-dictionary.md). Development and production Neon endpoints are migrated and audited; Console confirms independent named Free projects and five-minute scale-to-zero. `npm run db:audit -- --env production` performs a read-only production check. `npm run db:migrate`, `npm run db:roles`, `npm run db:fixture` and `npm run db:verify` are explicit development commands. The normal app/check workflow requires no live database.
+
+## Stage 4: ingest one historical race
+
+Development now contains Las Vegas 2024 (9644); production remains empty. Run `npm run data:ingest -- 9644` twice, then `npm run data:inspect -- 9644` to see stable counts/version and a lap's provenance. Only six agreed endpoints are retrieved, with bounded retries/responses. Publication is atomic; failed refreshes preserve the last dataset, and raw retention is bounded. No UI ingestion or app database access was added. Read [Stage 4 guide](docs/stage-4-ingestion.md) for exact commands, local integration checks, ELT explanation, tradeoffs and two exercises with separate answers.

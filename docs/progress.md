@@ -94,3 +94,33 @@ Neon status and limitation:
 Checkpoint: run db:migrate → db:roles → db:fixture → db:verify against development; explain each table's grain, the session-entry/lap join, event-content keys and index tradeoffs. App still runs without a database. Remote database and Console verification steps are complete. Run db:audit for either environment; all required account/project confirmations passed. See stage-3-database.md for exact recheck commands and the two exercises.
 
 Next stage: await the user's numbered Stage 4 request. Stage 3 checkpoint complete. No later-stage features implemented.
+
+
+## Stage 4 — ingestion for one historical race
+
+Purpose: a bounded, traceable ELT pipeline that atomically replaces one historical session and preserves its last successful dataset on failure.
+
+Implemented:
+- CLI `data:ingest -- 9644 [--env development|production]` allows the Stage 2 investigated Las Vegas session only. Six full-session endpoints; 2 MB/2,000-row caps; six logical requests/18 maximum attempts; 20-second timeout; bounded transient/rate-limit retries and 2.1-second spacing. No telemetry, bulk season downloads or public/UI ingestion endpoint.
+- Validate arrays, source keys/types/timestamps/natural-key uniqueness/driver joins, completed race and nonempty endpoints. Raw original text and unknown fields survive; mapped unknowns become NULL.
+- Migration 004 adds transactional private staging, session dataset/version and run endpoint/checksum/count/change metadata. Session lock covers fetch/publication. Restricted fixed-search-path SQL functions publish archive/typed replacement/version/status/retention atomically or record failure separately.
+- Identical response bytes retain raw/typed rows/version; changed responses replace the complete session and remove absent rows. Raw-object multiset additions/removals record corrections as replacement. Event surrogate IDs may change. Linked driver identities block this initial refresh mapping.
+- Retain latest successful six payloads/source records; latest 20 compact run summaries plus a protected older dataset origin (at most 21 completed summaries). No failed raw copies or staging left after rollback. Next CLI marks interrupted running attempts failed. Existing Stage 2 local files preserved.
+- Parameterized provenance inspection SQL/CLI, dedicated local f1_stage4_test integration database and ignored test URLs. CI uses disposable f1_test without Neon secrets. Stage 4 guide explains ELT, exact commands/walkthrough, tradeoff and two exercises with separate answers.
+
+Verification actually performed:
+- Migration 004 applied to dedicated local test database and both Neon environments, preserving earlier migration files/checksums.
+- Real local integration tests pass: identical fixture twice without typed/raw growth, duplicate pit occurrences, malformed input, simulated endpoint outage, SQL constraint failure with old data retained, reader seeing old race before COMMIT, corrections/deletions, provenance trace and bounded history over 22 further repeats. App publication/general ingestion DELETE denied; synthetic rows removed only from guarded local test database.
+- Two actual development OpenF1 ingestions succeeded with identical version 717419c96131a938952397e5c9a168d27c4c8c0c2fa176be6b846f157b7ebad0. Stable counts: 1 session, 20 entries, 940 laps, 59 stints, 39 pit events, 37 control events. SQL inspection after repeat: six payloads, 1,096 source records; 937 known/three NULL lap durations. Driver 1/lap 1 duration 106.37 seconds traces to raw laps ordinal 7 and its URL/checksum/run/version.
+- Existing live development constraints/permissions verification passed without changing the real race. Its intentionally wrong synthetic join now restricts both sides to fixture sessions, preventing real driver-number matches from changing the teaching answer. Production read-only audit passes four versions, zero sessions and restricted TLS/identity/grants.
+- Final `npm run check` passed lint, types, 16/16 unit/smoke tests and production static build. A transient Windows/OneDrive EPERM cache error was resolved by removing only the verified generated .next cache and rebuilding. Final local ingestion integration suite and live development audit passed; production remains empty. No deployment or paid upgrade/live subscription performed.
+
+Limitations:
+- Shape/key/join/nonempty checks cannot certify complete real-world source coverage; valid upstream omissions are authoritative deletions on successful refresh. Review recorded source-object changes/counts.
+- Only latest raw source version is replayable; older checksums/counts/change summaries remain until bounded pruning. JSON formatting/order can change versions even when objects are equivalent. Event IDs are not physical incident identity.
+- Interrupted status is reconciled on next CLI, with no scheduler added. Rate spacing is per process. Future multi-query app reads require a consistent transaction.
+- Production remains empty; app still works without DB reads. No race analytics, charts, app APIs, snapshots or AI. No AI budget behavior exists to test yet.
+
+Checkpoint: ingest twice, inspect stable counts/version and trace a lap. This is ELT: extract, validate, load raw staging, project typed values in SQL, then commit. See stage-4-ingestion.md for commands and exercises.
+
+Next stage: await the user's numbered Stage 5 request. Do not implement later features.
