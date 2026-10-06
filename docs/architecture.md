@@ -1,0 +1,43 @@
+# Architecture — Stage 1
+
+## Implemented
+
+Next.js App Router and TypeScript render `/` and `/methodology` using local content and CSS. There are no app API routes, external requests, secrets, data stores, metrics or AI calls. Both pages can be built statically. ESLint, TypeScript, Node test runner through tsx, and Next production build form the verification workflow. GitHub Actions is configured but has not run remotely.
+
+## Proposed later data flow (not implemented)
+
+Historical source APIs → Node/TypeScript ingestion → preserved raw payloads and provenance → normalized Postgres tables → explicit analytical SQL → versioned evidence snapshots → app charts and explanations.
+
+- **Ingestion:** scripts fetch only curated historical sessions, handle pagination/rate limits, retain source URL, retrieval time, raw payload and content hash. Later idempotent upserts and quality checks should make reruns safe.
+- **Postgres:** Neon Free will hold normalized race/session, driver, lap, stint and pit records. Explicit SQL migrations belong in `sql/migrations`; source identifiers and raw values remain traceable. Account setup, access roles and free-plan verification are deferred.
+- **Analytical SQL:** named queries in `sql/queries` calculate comparisons and exclusions with documented units and definitions. The UI and AI consume the same computed evidence; neither invents figures.
+- **App APIs:** future server handlers expose validated read-only operations, fixed queries and bounded parameters. Database credentials remain server-side; no browser SQL or public write path.
+- **Bundled snapshots:** generated, versioned JSON carries computed values, provenance, filters, missing-data labels and evidence IDs for three curated races. A later build must remain useful without a database or AI. Snapshots do not exist yet.
+- **AI tools:** a later optional server-side explainer retrieves bounded evidence through allowlisted tools, cites evidence IDs, shows tool activity and enforces a spending/request cap. No arbitrary SQL, data mutation or private reasoning display. A deterministic explanation fallback will support the public demo.
+
+## Version 1 boundary
+
+Target: a public, login-free demo with three curated historical races, driver comparisons, accessible mobile-friendly charts and evidence-linked explanations. Race selection depends on source coverage validation. Historical descriptive analysis only. Exclude live timing, betting, video, car-position animation, full telemetry, optimization, predictions and certain counterfactual claims. Missing information is labeled; an exclusion is visible rather than silently deleting raw data.
+
+Use Next.js/TypeScript, Node ingestion, explicit SQL, Neon Free, GitHub and Vercel Hobby. Select a lightweight chart library only when charts are needed. Verify official free-plan terms at deployment; never enable an upgrade automatically. No hosting URL was present in the inspected directory or request; resolve it at the deployment stage. Nothing is deployed in Stage 1.
+
+## Proposed folder structure
+
+Only folders marked existing are created:
+
+```text
+src/app/                 existing: pages, layout, styles
+src/components/          future: charts, controls, evidence views
+src/lib/server/          future: database access and validated evidence services
+src/lib/analytics/       future: typed output contracts and helpers
+src/lib/ai/              future: allowlisted tools and budget enforcement
+scripts/ingest/          future: Node/TypeScript source adapters
+scripts/snapshots/       future: evidence export
+sql/migrations/          future: schema changes
+sql/queries/             future: analytical calculations
+data/raw/               future: preserved source payloads (storage policy TBD)
+data/snapshots/         future: bundled public evidence
+tests/                  existing: page rendering smoke tests
+docs/                   existing: implementation and learning records
+.github/workflows/      existing: CI definition
+```
