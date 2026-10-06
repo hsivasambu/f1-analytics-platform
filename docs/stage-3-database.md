@@ -84,7 +84,7 @@ npm run check
 - Roles: Created restricted role f1_app_login / f1_ingest_login; saved only in .env.development.local. Passwords are random and never printed. Reruns retain the existing roles/passwords; a missing local URL produces a recovery error rather than resetting a password.
 - Fixture: three joined rows—Fixture A laps 1/2 with exact duration 90.125 / NULL and Fixture B lap 1 with 91.5 and no stint. **All values are synthetic, not F1 measurements.** The transaction rolls back. No fake race rows remain; identity sequences can advance even after rollback.
 - Verify: PASS for joins/timezones/nulls/keys/FKs, event multiplicity/replay, provenance, rollback and both real restricted logins. All verification fixtures roll back. Requires migrations and db:roles first.
-- Check: lint, TypeScript and 14 unit/smoke tests, then a static build of the two app routes. Database verification is separate locally; CI also runs it using disposable Postgres.
+- Check: lint, TypeScript and 14 unit/smoke tests, then a static build of the two app routes. Database verification is separate locally; CI also runs it using disposable Postgres. The Stage 3 implementation passed [the fresh-database CI run](https://github.com/hsivasambu/f1-analytics-platform/actions/runs/37408128495).
 
 Production setup, only after the separate Free project and local production owner URL exist:
 
