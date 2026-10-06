@@ -52,7 +52,7 @@ Use unconstrained-scale numeric seconds and timestamptz for source instants, ret
 
 ## D012 — Three credential purposes and separate environments
 
-Migration credentials perform explicit DDL/provisioning. SQL-created ingestion/app logins inherit NOLOGIN privilege groups: ingestion can write typed projections and append source observations, while the app can only SELECT typed tables. Both lack admin/DDL/temp privileges; the app cannot read raw/migration tables. No credentials reach browser variables, Git, CI or chat. User-created development/production targets now have distinct Neon endpoints, applied migrations and verified restricted connections. Separate project names/membership and account Free status still require Console confirmation because the agent browser is signed out. Published Free limits were checked; no upgrade was selected.
+Migration credentials perform explicit DDL/provisioning. SQL-created ingestion/app logins inherit NOLOGIN privilege groups: ingestion can write typed projections and append source observations, while the app can only SELECT typed tables. Both lack admin/DDL/temp privileges; the app cannot read raw/migration tables. No credentials reach browser variables, Git, CI or chat. User-created development/production targets now have distinct Neon endpoints, applied migrations and verified restricted connections. Console subsequently confirmed two independent named Free projects, with endpoints matching the local env files, Postgres 18 and five-minute scale-to-zero. Published Free limits were checked; no upgrade was selected.
 
 ## D013 — Explicit, checksum-tracked SQL migrations and disposable verification
 
