@@ -43,3 +43,7 @@ FROM a JOIN b ON a.lap_number = b.lap_number;
 
 1. `src/app/methodology/page.tsx` supplies the route; `src/app/layout.tsx` supplies navigation. Both render local content only.
 2. One row: lap 2, difference -1 second. Lap 1 has no counterpart. Matching drivers would compare identities rather than the same race lap. A real query must also match the race/session and apply explicit eligibility rules.
+
+## Stage 2 investigation
+
+The [Stage 2 guide](docs/stage-2-investigation.md) contains exact CLI commands, actual coverage findings, a record walkthrough and two exercises with separate answers. Run `npm run data:discover -- 2024` for session metadata or `npm run data:investigate -- 2024` for the bounded investigation. Raw JSON is retained under gitignored `data/raw/openf1/`; the derived [profile](docs/openf1-profile.md) documents the observed sample. The app remains the Stage 1 shell.

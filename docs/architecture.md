@@ -41,3 +41,9 @@ tests/                  existing: page rendering smoke tests
 docs/                   existing: implementation and learning records
 .github/workflows/      existing: CI definition
 ```
+
+## Stage 2 — implemented investigation layer
+
+`scripts/openf1/core.ts` implements bounded historical HTTP access and field/key profiling; `scripts/openf1/cli.ts` discovers race sessions, probes three candidates and samples two drivers from the first candidate passing endpoint checks. These scripts run locally, outside the app. No database schema, SQL analytics, application API or AI is implemented.
+
+Raw JSON text and a URL/retrieval-time/hash manifest are archived per run in gitignored `data/raw/openf1`. Low-volume driver/stint/pit/control responses cover three candidates; extended lap sampling covers only one race. Derived field profiles and join checks are generated locally, with a reviewed result in `docs/openf1-profile.md`. See `docs/stage-2-investigation.md` for exact bounds and actual findings. The original proposed ingestion and snapshot locations remain future designs; this is investigation, not production ETL.

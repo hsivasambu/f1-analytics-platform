@@ -12,7 +12,9 @@
     "lint": "eslint . --max-warnings=0",
     "typecheck": "next typegen && tsc --noEmit",
     "test": "tsx --test tests/*.test.tsx",
-    "check": "npm run lint && npm run typecheck && npm test && npm run build"
+    "check": "npm run lint && npm run typecheck && npm test && npm run build",
+    "data:discover": "tsx scripts/openf1/cli.ts discover",
+    "data:investigate": "tsx scripts/openf1/cli.ts investigate"
   },
   "dependencies": {
     "next": "16.3.8",
