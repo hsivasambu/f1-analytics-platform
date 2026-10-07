@@ -8,3 +8,4 @@ coverage/
 *.log
 next-env.d.ts
 data/raw/
+data/reports/

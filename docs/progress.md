@@ -125,3 +125,24 @@ Limitations:
 Checkpoint: ingest twice, inspect stable counts/version and trace a lap. This is ELT: extract, validate, load raw staging, project typed values in SQL, then commit. See stage-4-ingestion.md for commands and exercises.
 
 Next stage: await the user's numbered Stage 5 request. Do not implement later features.
+
+## Stage 5 - quality reporting and analysis eligibility
+
+Purpose: inspect source integrity and conservatively identify usable comparison observations without rewriting raw history.
+
+Implemented:
+- Migration 005: source/policy-version quality reports, per-source-occurrence lap assessments, reader SELECT grants and restricted 20-version retention. Automatic analysis runs inside ingestion publication before COMMIT; standalone data:quality uses the same lock/consistent transaction and bounded local JSON exports.
+- Integrity checks: natural-key duplicates, source session/driver references, manifest/projection counts and keys, invalid durations. Hard failures block all candidates. Missing durations stay NULL; legitimate gaps, early driver histories, empty endpoints, pit timing disagreements and ambiguous stints remain inspectable warnings. Explicit retirement evidence is separate from coverage claims.
+- Pit source lap/timestamp and pit-out exclusions; half-open lap/control windows; separate safety-car/VSC/red neutralization, yellow warning, blue warning and uncertain boundary classifications. Pit-exit green lights and pending ending messages cannot establish normal track state. Explicit car/lap deletion notices map by identifiers rather than announcement timestamp. Every green status is not_established.
+- One-second manual conservative boundary buffer, never described as a measured timing error. Unknown/estimated intervals remain labelled. Eligibility leaves raw and typed observations intact. No UI-triggered ingestion/public write API, analytical performance metric, app quality UI, snapshots or AI added.
+- Architecture/dictionary/metric definitions/decision log and stage-5-quality.md describe actual behavior, exact commands, walkthrough, tradeoff and two exercises with separate answers.
+
+Verification actually performed:
+- npm run check passed lint, TypeScript, 29/29 tests and static production build. Synthetic tests cover absent/NULL/zero/invalid durations, duplicate keys/orphans/manifests, gaps/retirement, ambiguous stints, pit evidence, half-open neutralization boundaries, VSC ending versus ended, red resumption, pit-exit green/DRS, sector/driver yellow scopes, post-coverage events, delayed deletion notices and unavailable timestamps.
+- Dedicated local database integration passed: repeat ingestion produces one report/two assessments; malformed/outage/SQL failure preserves prior report; successful correction retains older assessment evidence after raw pruning; publication remains atomic; app cannot update assessments; distinct versions retain exactly 20 reports. Fixture cleanup touches only the guarded disposable local database.
+- Migration 005 applied to local fixture database and both Neon environments. Live read-only credential/TLS/ledger audits passed; production remains empty.
+- Existing development session 9644 reported twice with identical report ID and source version 717419c96131a938952397e5c9a168d27c4c8c0c2fa176be6b846f157b7ebad0. 940 laps, 836 pace/stint candidates, 104 excluded laps, zero hard findings and 49 warnings. Original source counts remain 1/20/940/59/39/37. No new OpenF1 downloads or source refreshes performed. No deployment performed.
+
+Limitations: candidate is not certified green or a matched pair. Approximate source timestamps and incomplete race-control coverage limit certainty. Sector-yellow overlap cannot establish sector passage. Early driver coverage does not establish retirement. Exclusion counts overlap; use per-lap candidate counts. Older retained reports cannot replay pruned raw payloads. Local exports and database history retain latest 20 versions, not indefinite JSON copies. AI budget behavior does not exist yet.
+
+Checkpoint: run data:quality -- 9644, inspect a lap's exclusions/evidence, explain warning versus hard failure and the effect of sample exclusions. See stage-5-quality.md. Next stage: await the user's numbered Stage 6 request; stop after Stage 5.

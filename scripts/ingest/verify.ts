@@ -17,6 +17,10 @@ async function main() {
   const first=await load(); const second=await load();
   assert.equal(first.data_version,second.data_version);
   assert.equal(second.changes.same_version,true);
+  const qualitySnapshot=async()=>JSON.stringify((await reader.query('SELECT report_id,data_version,summary FROM f1.quality_reports ORDER BY data_version')).rows);
+  const qualityBefore=await qualitySnapshot();
+  assert.equal((await reader.query('SELECT count(*)::int AS n FROM f1.quality_reports')).rows[0].n,1,'Repeat loads share a versioned report');
+  assert.equal((await reader.query('SELECT count(*)::int AS n FROM f1.lap_assessments')).rows[0].n,2,'Repeat loads do not duplicate assessments');
   assert.equal((await owner.query('SELECT count(*)::int AS n FROM f1.laps')).rows[0].n,2);
   assert.equal((await owner.query('SELECT count(*)::int AS n FROM f1_ingest.source_payloads')).rows[0].n,6);
   assert.equal((await owner.query('SELECT count(*)::int AS n FROM f1.pit_events')).rows[0].n,2);
@@ -26,6 +30,7 @@ async function main() {
   await assert.rejects(()=>ingest(writer,9644,async()=>{throw new Error('simulated temporary endpoint outage');},'fixture')); assert.equal(await snapshot(),before);
   const badSql=fixtureRows();badSql.stints[0].tyre_age_at_start=-1;await assert.rejects(()=>load(badSql));assert.equal(await snapshot(),before);
   assert.equal((await owner.query('SELECT count(*)::int AS n FROM f1_ingest.ingestion_runs WHERE status=\'failed\'')).rows[0].n,3);
+  assert.equal(await qualitySnapshot(),qualityBefore,'Failed refresh preserves published quality');
   const corrected=fixtureRows();corrected.laps=corrected.laps.slice(0,1);corrected.laps[0].lap_duration=89.5;
   // Inspect a different real reader after SQL publication but before its COMMIT.
   const proxy=new Proxy(writer,{get(target,prop){if(prop==='query') return async(text:string,args?:unknown[])=>{
@@ -33,22 +38,26 @@ async function main() {
   };const v=Reflect.get(target,prop);return typeof v==='function'?v.bind(target):v;}}) as Client;
   const updated=await ingest(proxy,9644,async progress=>{const b=fixtureBundle(corrected);await progress(b);return b;},'fixture');
   assert.notEqual(updated.data_version,first.data_version);
+  assert.equal((await reader.query('SELECT count(*)::int AS n FROM f1.quality_reports')).rows[0].n,2,'Correction retains the previous quality version');
+  assert.equal((await reader.query('SELECT count(*)::int AS n FROM f1.lap_assessments')).rows[0].n,3,'Historical assessments survive raw retention pruning');
   assert.deepEqual(updated.changes.source_object_changes.laps,{added_objects:1,removed_objects:2});
   assert.equal((await reader.query('SELECT lap_duration FROM f1.laps')).rows[0].lap_duration,'89.5');
   assert.equal((await owner.query('SELECT count(*)::int AS n FROM f1_ingest.source_payloads')).rows[0].n,6);
   const trace=await owner.query(`SELECT l.lap_duration,r.raw_record,p.response_sha256,p.request_url,p.run_id
    FROM f1.laps l JOIN f1_ingest.source_records r ON r.record_id=l.source_record_id JOIN f1_ingest.source_payloads p USING(payload_id)`);
   assert.equal(trace.rows[0].raw_record.lap_duration,89.5);assert.equal(trace.rows[0].run_id,updated.run_id);
-  for(let i=0;i<22;i++) await load(corrected);
+  for(let i=0;i<22;i++) {corrected.laps[0].lap_duration=90+i/100;await load(corrected);}
+  assert.equal((await reader.query('SELECT count(*)::int AS n FROM f1.quality_reports')).rows[0].n,20,'Distinct report history is bounded');
   assert.ok((await owner.query('SELECT count(*)::int AS n FROM f1_ingest.ingestion_runs')).rows[0].n<=21);
   assert.equal((await owner.query('SELECT count(*)::int AS n FROM f1_ingest.staged_payloads')).rows[0].n,0);
   await assert.rejects(()=>reader.query('SELECT f1_ingest.publish($1)',[updated.run_id]),e=>(e as {code:string}).code==='42501');
   await assert.rejects(()=>writer.query('DELETE FROM f1.laps'),e=>(e as {code:string}).code==='42501');
-  console.log('PASS: repeat-load counts/raw retention; malformed input, outage and SQL failure recovery; atomic reader visibility; corrections/deletions; source trace; bounded history; reader/write permissions');
+  await assert.rejects(()=>reader.query('UPDATE f1.lap_assessments SET pace_candidate=true'),e=>(e as {code:string}).code==='42501');
+  console.log('PASS: repeat-load counts/raw retention; malformed input, outage and SQL failure recovery; atomic reader visibility; corrections/deletions; source trace; versioned quality and 20-report retention; reader/write permissions');
  } finally {
   // Named local disposable fixture database only. Preserve schema/roles for repeat testing.
   await owner.query('BEGIN');
-  for(const t of ['session_datasets','laps','stints','pit_events','race_control_events','session_entries','sessions']) await owner.query(`DELETE FROM f1.${t}`);
+  for(const t of ['quality_reports','session_datasets','laps','stints','pit_events','race_control_events','session_entries','sessions']) await owner.query(`DELETE FROM f1.${t}`);
   for(const t of ['staged_payloads','source_records','source_payloads','ingestion_runs']) await owner.query(`DELETE FROM f1_ingest.${t}`);
   await owner.query('COMMIT');
   await Promise.all([owner.end(),writer.end(),reader.end()]);

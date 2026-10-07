@@ -37,8 +37,8 @@ async function main() {
       const count = (await client.query('SELECT count(*)::integer AS rows FROM f1.sessions')).rows[0].rows;
       if (variable === 'MIGRATION_DATABASE_URL') {
         const versions = await client.query('SELECT version FROM f1_meta.schema_migrations ORDER BY version');
-        assert.equal(versions.rowCount, 4);
-        console.log(`PASS: ${env} migration ledger has four versions; sessions=${count}`);
+        assert.equal(versions.rowCount, 5);
+        console.log(`PASS: ${env} migration ledger has five versions; sessions=${count}`);
       } else {
         for (const flag of ['rolsuper', 'rolcreatedb', 'rolcreaterole', 'rolreplication', 'rolbypassrls']) assert.equal(role[flag], false);
         const acl = (await client.query(`SELECT

@@ -69,3 +69,11 @@ Use the six investigated endpoints for session 9644 only. Validate full response
 ## D016 — Latest-source retention and explicit replacement changes
 
 Keep six latest successful payloads and their observations, plus 20 compact run summaries and the protected origin if older. Identical bytes retain rows/version; changed responses replace session rows, treating source-object corrections as removals/additions and removing absent rows. Event IDs may change. Tradeoff: older raw versions are unavailable for full replay, and valid upstream omissions cannot be established from endpoint responses alone. Refuse existing linked identities instead of silently discarding identity work. Stage 2 investigation files are preserved separately.
+
+## D017 - Versioned quality without rewriting observations
+
+Save findings per source/policy version and assessments per source occurrence. Atomic publication includes quality; hard failures block analysis rather than erase evidence. Retain 20 reports separately from latest-only source retention. Tradeoff: historical findings remain inspectable but older source replay is unavailable.
+
+## D018 - Conservative temporal eligibility
+
+Recognized control transitions, half-open intervals and a manual one-second boundary buffer avoid false precision. Pit source lap and approximate time both contribute evidence. Yellow differs from neutralization; no lap is certified green. Deleted times require explicit car/lap identifiers. Tradeoff: smaller samples and possible over-exclusion; the buffer is not a measured error guarantee.

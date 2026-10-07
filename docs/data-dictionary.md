@@ -1,6 +1,6 @@
-# Data dictionary — implemented Stage 3 schema
+# Data dictionary — implemented through Stage 5
 
-Migrations are in `sql/migrations`. `f1` holds typed source projections, `f1_ingest` holds raw provenance, and `f1_meta` holds migration history. No real race data is loaded into Postgres yet. The Stage 2 local archive and [observed profile](openf1-profile.md) remain the empirical basis. Fixtures are explicitly synthetic and roll back.
+Migrations are in `sql/migrations`. `f1` holds typed source projections, `f1_ingest` holds raw provenance, and `f1_meta` holds migration history. Development contains the Stage 4 historical session 9644; production remains empty. The Stage 2 local archive and [observed profile](openf1-profile.md) remain the empirical basis. Fixtures are explicitly synthetic and roll back.
 
 ## Grain, primary keys and relationships
 
@@ -84,3 +84,9 @@ Primary keys already support session/driver prefix searches and parent joins. `l
 - `f1.session_datasets`: grain one currently published session; PK/FK `session_key`, origin `run_id uuid` FK, `data_version text`, `published_at timestamptz`, `endpoint_counts jsonb`. Unchanged bytes retain origin/time/version, while new successful attempt metadata records the later retrieval. Reader can SELECT this table; ingestion publication modifies it only through its restricted function.
 - Archive UPDATE remains forbidden. Migration-owner deletion is now permitted for controlled retention through SECURITY DEFINER publication; ingestion/app have no general archive DELETE permission. Latest successful payloads/records survive; superseded versions are pruned. Compact history retains 20 summaries plus a protected origin if older. Existing stage-3 archive/identity rules otherwise hold.
 - A changed response replaces the entire session projections, removes absent source rows and can regenerate pit/control surrogate IDs. Whole-object multiset additions/removals record corrections as removal plus addition. No new UUID drivers are inferred/created; existing linked entries block this initial refresh policy.
+
+## Stage 5 quality tables
+
+f1.quality_reports grain: one session/source-version/policy-version assessment. UUID primary key; unique (session_key,data_version,quality_version). JSONB summary, severity/evidence findings, counts, inferred windows and policy; generated_at timestamptz. No FK to mutable current session data: historical findings survive replacement. Retain latest 20 per curated session.
+
+f1.lap_assessments grain: one source lap array occurrence within a report. PK (report_id,source_ordinal); report FK cascades only during bounded report pruning. Report/driver/lap index supports inspection. Driver numbers are session-scoped, never global identities. Diagnostic duration is nullable numeric seconds; source zeros remain zero. Nullable timestamptz intervals have duration/estimated_next_start/unavailable provenance. Exclusion/warning arrays and JSON evidence retain endpoint ordinals, pit matching mode and control closure details. Pace candidate differs from stint candidate, which also requires exactly one known-compound stint. Control states separate neutralization, yellow, boundary possibility, no known interruption and unmappable. Green status is always not_established. No raw/typed lap is deleted by this layer; historical references cannot replay pruned source versions.

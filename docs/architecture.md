@@ -1,4 +1,4 @@
-# Architecture — implemented through Stage 3
+# Architecture — implemented through Stage 5
 
 ## Stage 1 foundation
 
@@ -59,3 +59,7 @@ The app remains independent of Postgres. No production ingestion mapper, histori
 ## Stage 4 implemented ingestion
 
 `scripts/ingest/cli.ts` accepts investigated session 9644 and an explicit environment. It extracts six full-session responses with bounds, validates keys/types/joins, loads private staging/raw provenance, then projects typed rows in SQL through migration 004's atomic publication function. This is ELT with pre-load validation. `session_datasets` identifies each published version; metadata records checksums/counts/errors and replacement changes. Latest raw payloads plus bounded run history replace indefinite copies. Development contains Las Vegas 2024; production remains empty. The app has no DB-backed routes or ingestion control. See `stage-4-ingestion.md` for actual commands, retention, recovery and limitations.
+
+## Stage 5 implemented quality layer
+
+Ingestion runs TypeScript quality analysis after raw staging and SQL typed publication, inside the same transaction before COMMIT. It compares retained raw arrays, source manifest and typed projections, then saves versioned findings and per-source-lap assessments. Report failure rolls publication back. The standalone data:quality CLI uses the same session lock and a consistent transaction, exporting bounded ignored JSON. App credentials SELECT reports but cannot change eligibility. No quality UI/API was added. Future analytical SQL must select current source/policy versions and candidate/exclusion fields; future AI explains retrieved evidence rather than creating eligibility or executing arbitrary SQL.

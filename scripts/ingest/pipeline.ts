@@ -1,3 +1,4 @@
+import { recordQuality } from '../quality/service';
 import assert from 'node:assert/strict';
 import { createHash, randomUUID } from 'node:crypto';
 import type { Client } from 'pg';
@@ -88,6 +89,7 @@ export async function ingest(client: Client, key: number, fetchBundle: (progress
         await client.query('INSERT INTO f1_ingest.staged_payloads(run_id,endpoint,request_url,retrieved_at,raw_response) VALUES($1,$2,$3,$4,$5)', [run,endpoint,p.url,p.retrievedAt,p.raw]);
       }
       await client.query('SELECT f1_ingest.publish($1)', [run]);
+      await recordQuality(client,key);
       const result = (await client.query('SELECT run_id,status,data_version,endpoint_summary,changes FROM f1_ingest.ingestion_runs WHERE run_id=$1', [run])).rows[0];
       await client.query('COMMIT');
       return result;
