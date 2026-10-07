@@ -55,3 +55,7 @@ Read the [Stage 3 guide](docs/stage-3-database.md) for Neon Free setup, secret-f
 ## Stage 4: ingest one historical race
 
 Development now contains Las Vegas 2024 (9644); production remains empty. Run `npm run data:ingest -- 9644` twice, then `npm run data:inspect -- 9644` to see stable counts/version and a lap's provenance. Only six agreed endpoints are retrieved, with bounded retries/responses. Publication is atomic; failed refreshes preserve the last dataset, and raw retention is bounded. No UI ingestion or app database access was added. Read [Stage 4 guide](docs/stage-4-ingestion.md) for exact commands, local integration checks, ELT explanation, tradeoffs and two exercises with separate answers.
+
+## Stage 5: inspect quality and eligibility
+
+Run `npm run data:quality -- 9644` to save a versioned report and inspect its JSON export. Current development data has 940 laps, 836 candidates and 104 excluded laps; no candidate is certified green-flag. Ingestion now publishes quality atomically with race data. Read the [Stage 5 guide](docs/stage-5-quality.md) for exclusions, uncertainty, exact checks, SQL inspection and two exercises with separate answers. Production remains empty; the app still needs no database.

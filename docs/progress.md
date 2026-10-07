@@ -146,3 +146,5 @@ Verification actually performed:
 Limitations: candidate is not certified green or a matched pair. Approximate source timestamps and incomplete race-control coverage limit certainty. Sector-yellow overlap cannot establish sector passage. Early driver coverage does not establish retirement. Exclusion counts overlap; use per-lap candidate counts. Older retained reports cannot replay pruned raw payloads. Local exports and database history retain latest 20 versions, not indefinite JSON copies. AI budget behavior does not exist yet.
 
 Checkpoint: run data:quality -- 9644, inspect a lap's exclusions/evidence, explain warning versus hard failure and the effect of sample exclusions. See stage-5-quality.md. Next stage: await the user's numbered Stage 6 request; stop after Stage 5.
+
+- Stage 5 implementation 65f45dd committed/pushed. Fresh GitHub CI passed app checks, all five migrations, role provisioning, fixture/schema/permission audit and versioned quality/retention integration on disposable Postgres: https://github.com/hsivasambu/f1-analytics-platform/actions/runs/37564501777. Existing user dependency/lockfile edits remain outside Stage 5 commits.
