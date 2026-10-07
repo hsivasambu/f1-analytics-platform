@@ -148,3 +148,23 @@ Limitations: candidate is not certified green or a matched pair. Approximate sou
 Checkpoint: run data:quality -- 9644, inspect a lap's exclusions/evidence, explain warning versus hard failure and the effect of sample exclusions. See stage-5-quality.md. Next stage: await the user's numbered Stage 6 request; stop after Stage 5.
 
 - Stage 5 implementation 65f45dd committed/pushed. Fresh GitHub CI passed app checks, all five migrations, role provisioning, fixture/schema/permission audit and versioned quality/retention integration on disposable Postgres: https://github.com/hsivasambu/f1-analytics-platform/actions/runs/37564501777. Existing user dependency/lockfile edits remain outside Stage 5 commits.
+
+## Stage 6 - SQL learning workbook
+
+Purpose: personally change explicit SQL filters, joins and windows and understand sample/NULL/calculation effects using the implemented schema.
+
+Implemented:
+- Ten progressively harder SQL lessons: session counts; driver coverage; fastest candidate with ties; continuous median; same-session/same-eligible-lap paired comparison; inclusive stint summaries; guarded LAG changes; trailing lap-number rolling pace; pit/control UNION ALL timeline; labelled pit-exclusion sensitivity.
+- Separate sql/workbook/exercises.md, answers.md and answer SQL files, plus workbook README with exact commands, expected outputs, manual walkthrough, concept explanations and prediction questions. Exercises 5 and 8 provide the personal filter/join/window checkpoint.
+- Shared CTE selects current published source version and quality-v1. CLI uses APP_DATABASE_URL, safe bound numeric parameters, fixed lesson files, existing timeouts and repeatable-read/read-only transaction. Reject missing report, hard quality failures, absent selected entries, invalid filters or identical driver selections. Output includes source/policy versions, sample counts and green status not established. No schema migration, source download, persisted metrics, UI/dashboard/chart/API/snapshot or AI added.
+- Known fictional local fixture uses actual ingestion/schema/quality before querying. Guarded local test database only, empty start and cleanup afterward; --show prints predictions' results. CI adds sql:verify after existing ingestion checks. Raw source/provenance and production race data unchanged.
+
+Verification actually performed:
+- All ten lessons ran successfully read-only against current development session 9644: 940 laps/836 candidates, 20 entries, 59 stints, 39 pits and 37 control events. Drivers 1/44 each have 44 candidates but share 41 lap numbers; signed mean A-B=0.25707317073170731707 seconds and median=0.403 seconds. Pit-relaxed mode has 47 pairs and mean=0.24491489361702127660 seconds. Timeline retains 76 events. No performance/causal claim made.
+- Local sql:verify and sql:verify -- --show passed: 13 fictional laps/eight candidates/one missing duration, zero-lap entry retained, odd/even medians and empty sample NULL, fastest ties, three matched pairs with mean -7/3 and median -3, unambiguous stint summary, adjacent eligible LAG, lap-number gap/full rolling-window checks, unknown event/service timestamps retained, pit-relaxed five-pair mean +2.6, preserved neutralization/boundary exclusions, zero matched samples and display-filter history.
+- Intentionally removing lap equality produces 15 combinations and wrong-sample mean -47/15; intentionally replacing RANGE with ROWS bridges lap six and yields 293/3 instead of NULL at B lap seven. Both variations executed and checked, not merely described.
+- npm run check passed lint, TypeScript, 29/29 existing tests and static production build. SQL arithmetic is verified separately with Postgres, not imitated in JavaScript. No deployment, paid service or AI API usage performed.
+
+Limitations: current-report dependency; standalone answer files need context.sql; display output defaults to first 12 rows with truncation notice; numeric values retain pg precision as strings. Same-number laps can occur under different wall-clock conditions. Fuel/car/traffic/weather/tyres/selection are uncontrolled; raw means do not prove skill or causal degradation. Sensitivity is illustrative, not a replacement for quality-v1. Production remains empty and the app remains the runnable foundation without DB dependency.
+
+Checkpoint: read exercises before answers, run sql:workbook -- --query 5, change range/driver pairing, then predict and inspect RANGE/ROWS differences in lesson 8. Next stage: await the user's numbered Stage 7 request. Stop after Stage 6.

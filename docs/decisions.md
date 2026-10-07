@@ -77,3 +77,11 @@ Save findings per source/policy version and assessments per source occurrence. A
 ## D018 - Conservative temporal eligibility
 
 Recognized control transitions, half-open intervals and a manual one-second boundary buffer avoid false precision. Pit source lap and approximate time both contribute evidence. Yellow differs from neutralization; no lap is certified green. Deleted times require explicit car/lap identifiers. Tradeoff: smaller samples and possible over-exclusion; the buffer is not a measured error guarantee.
+
+## D019 - Editable SQL workbook and shared current-version context
+
+Store ten explicit SQL answers with one shared source/policy-selection CTE. Run them with bound parameters and app credentials in a read-only repeatable-read transaction. Keep calculations in Postgres; the TypeScript runner selects files/parameters and prints results. Tradeoff: answer files depend on context.sql, but learners can change joins/windows without mixed-version calculations or persisted application changes.
+
+## D020 - Preserve lap-number gaps in descriptive windows
+
+Compute LAG/rolling history before display filtering. LAG differences require consecutive eligible numbers; rolling RANGE covers three lap numbers rather than three surviving rows, with explicit observed/eligible counts and NULL incomplete windows. Test intentionally wrong join/ROWS variants against a known local fixture. Tradeoff: gaps produce fewer complete estimates, but avoid concealing missing/excluded observations. Matched comparisons report the shared sample and do not rank skill or infer causal degradation.

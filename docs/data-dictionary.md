@@ -1,4 +1,4 @@
-# Data dictionary — implemented through Stage 5
+# Data dictionary — implemented through Stage 6
 
 Migrations are in `sql/migrations`. `f1` holds typed source projections, `f1_ingest` holds raw provenance, and `f1_meta` holds migration history. Development contains the Stage 4 historical session 9644; production remains empty. The Stage 2 local archive and [observed profile](openf1-profile.md) remain the empirical basis. Fixtures are explicitly synthetic and roll back.
 
@@ -90,3 +90,7 @@ Primary keys already support session/driver prefix searches and parent joins. `l
 f1.quality_reports grain: one session/source-version/policy-version assessment. UUID primary key; unique (session_key,data_version,quality_version). JSONB summary, severity/evidence findings, counts, inferred windows and policy; generated_at timestamptz. No FK to mutable current session data: historical findings survive replacement. Retain latest 20 per curated session.
 
 f1.lap_assessments grain: one source lap array occurrence within a report. PK (report_id,source_ordinal); report FK cascades only during bounded report pruning. Report/driver/lap index supports inspection. Driver numbers are session-scoped, never global identities. Diagnostic duration is nullable numeric seconds; source zeros remain zero. Nullable timestamptz intervals have duration/estimated_next_start/unavailable provenance. Exclusion/warning arrays and JSON evidence retain endpoint ordinals, pit matching mode and control closure details. Pace candidate differs from stint candidate, which also requires exactly one known-compound stint. Control states separate neutralization, yellow, boundary possibility, no known interruption and unmappable. Green status is always not_established. No raw/typed lap is deleted by this layer; historical references cannot replay pruned source versions.
+
+## Stage 6 derived query grains
+
+No stored schema changes. Workbook outputs have session grain (1), session-entry grain (2/4), tied fastest-lap grain (3), driver-pair/shared-sample grain (5), stint grain (6), driver/lap grain (7/8), typed source event occurrence grain (9), and labelled policy-sensitivity/shared-sample grain (10). All refer to one current source version and quality policy; driver joins use session plus driver number. Counts measure observed records, not certified source completeness. Timeline source IDs refer to current retained provenance and event IDs can change on refresh.

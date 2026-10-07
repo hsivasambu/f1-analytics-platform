@@ -59,3 +59,7 @@ Development now contains Las Vegas 2024 (9644); production remains empty. Run `n
 ## Stage 5: inspect quality and eligibility
 
 Run `npm run data:quality -- 9644` to save a versioned report and inspect its JSON export. Current development data has 940 laps, 836 candidates and 104 excluded laps; no candidate is certified green-flag. Ingestion now publishes quality atomically with race data. Read the [Stage 5 guide](docs/stage-5-quality.md) for exclusions, uncertainty, exact checks, SQL inspection and two exercises with separate answers. Production remains empty; the app still needs no database.
+
+## Stage 6: SQL learning workbook
+
+Read the [workbook](sql/workbook/README.md), predict results in the separate [exercises](sql/workbook/exercises.md), then inspect [answers](sql/workbook/answers.md) and ten SQL files. `npm run sql:workbook` runs all lessons read-only against current development data; `npm run sql:workbook -- --query 5 --from-lap 20 --to-lap 40` changes a matched comparison's range. `npm run sql:verify -- --show` prints known synthetic results and verifies critical calculations only in the guarded local test database. No dashboard or AI added.

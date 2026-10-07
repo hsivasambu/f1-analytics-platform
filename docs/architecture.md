@@ -1,4 +1,4 @@
-# Architecture — implemented through Stage 5
+# Architecture — implemented through Stage 6
 
 ## Stage 1 foundation
 
@@ -63,3 +63,7 @@ The app remains independent of Postgres. No production ingestion mapper, histori
 ## Stage 5 implemented quality layer
 
 Ingestion runs TypeScript quality analysis after raw staging and SQL typed publication, inside the same transaction before COMMIT. It compares retained raw arrays, source manifest and typed projections, then saves versioned findings and per-source-lap assessments. Report failure rolls publication back. The standalone data:quality CLI uses the same session lock and a consistent transaction, exporting bounded ignored JSON. App credentials SELECT reports but cannot change eligibility. No quality UI/API was added. Future analytical SQL must select current source/policy versions and candidate/exclusion fields; future AI explains retrieved evidence rather than creating eligibility or executing arbitrary SQL.
+
+## Stage 6 implemented SQL workbook
+
+Ten editable SQL answer files use a shared current-source/policy CTE. A Node/TypeScript CLI binds session/driver/lap-range values using APP_DATABASE_URL in one repeatable-read, read-only transaction. Postgres computes counts, percentiles, paired differences, stint summaries, LAG/rolling calculations, event timeline and exclusion sensitivity. Results print to the terminal with versions/sample counts; no metrics are persisted or served by an app API. A separate guarded local fixture verifier exercises the real ingestion/schema/quality pipeline and SQL, then removes its fictional data. CI runs it on disposable Postgres. No new migration, dashboard, bundled snapshot or AI tool is added.

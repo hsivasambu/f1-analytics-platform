@@ -36,3 +36,4 @@ jobs:
       - name: Configure isolated ingestion test fixture target
         run: cp .env.development.local .env.ingestion-test.local
       - run: npm run db:verify-ingestion
+      - run: npm run sql:verify
